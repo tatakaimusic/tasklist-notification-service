@@ -6,7 +6,7 @@ import jakarta.mail.MessagingException;
 
 import java.io.IOException;
 
-public interface KafkaNotificationService {
+public interface MailService {
 
-    void handleRegistration(User user) throws MessagingException, TemplateException, IOException;
+    void sendRegistrationEmail(User user) throws MessagingException, IOException, TemplateException;
 }

@@ -9,10 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import reactor.kafka.receiver.KafkaReceiver;
 import reactor.kafka.receiver.ReceiverOptions;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Configuration
 public class KafkaConfig {
@@ -53,11 +50,10 @@ public class KafkaConfig {
         return props;
     }
 
-    @Bean
-    public ReceiverOptions<String, Object> receiverOptions() {
+    public ReceiverOptions<String, Object> receiverOptions(String topic) {
         ReceiverOptions<String, Object> receiverOptions = ReceiverOptions
                 .create(receiverProperties());
-        return receiverOptions.subscription(topics)
+        return receiverOptions.subscription(Collections.singleton(topic))
                 .addAssignListener(receiverPartitions ->
                         System.out.println("assigned: " + receiverPartitions))   // TODO logs instead println to console
                 .addRevokeListener(receiverPartitions ->
@@ -65,9 +61,12 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaReceiver<String, Object> kafkaReceiver(
-            ReceiverOptions<String, Object> receiverOptions
-    ) {
-        return KafkaReceiver.create(receiverOptions);
+    public KafkaReceiver<String, Object> kafkaReceiverRegistrationTopic() {
+        return KafkaReceiver.create(receiverOptions(topics.get(0)));
+    }
+
+    @Bean
+    public KafkaReceiver<String, Object> kafkaReceiverReminderTopic() {
+        return KafkaReceiver.create(receiverOptions(topics.get(1)));
     }
 }
